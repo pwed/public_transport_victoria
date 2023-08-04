@@ -4,12 +4,14 @@ import logging
 
 from homeassistant.helpers.entity import Entity
 from .const import (
-    ATTRIBUTION, DOMAIN,
+    ATTRIBUTION,
+    DOMAIN,
 )
 from homeassistant.const import ATTR_ATTRIBUTION
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = datetime.timedelta(minutes=10)
+
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Add sensors for passed config_entry in HA."""
@@ -44,7 +46,7 @@ class Sensor(Entity):
             self._connector.route_name,
             self._connector.direction_name,
             self._connector.stop_name,
-            self._number
+            self._number,
         )
 
     # A unique_id for this entity with in this domain.
@@ -55,7 +57,7 @@ class Sensor(Entity):
             self._connector.route_name,
             self._connector.direction_name,
             self._connector.stop_name,
-            self._number
+            self._number,
         )
 
     @property
@@ -69,4 +71,3 @@ class Sensor(Entity):
         """Return the state attributes of the device."""
         _LOGGER.debug("Update has been called")
         await self._connector.async_update()
-

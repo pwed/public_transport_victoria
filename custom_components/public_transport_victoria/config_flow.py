@@ -8,8 +8,15 @@ from homeassistant import config_entries, core, exceptions
 from homeassistant.const import CONF_API_KEY, CONF_ID
 
 from .const import (
-    CONF_DIRECTION, CONF_DIRECTION_NAME, CONF_ROUTE, CONF_ROUTE_NAME,
-    CONF_ROUTE_TYPE, CONF_ROUTE_TYPE_NAME, CONF_STOP, CONF_STOP_NAME, DOMAIN
+    CONF_DIRECTION,
+    CONF_DIRECTION_NAME,
+    CONF_ROUTE,
+    CONF_ROUTE_NAME,
+    CONF_ROUTE_TYPE,
+    CONF_ROUTE_TYPE_NAME,
+    CONF_STOP,
+    CONF_STOP_NAME,
+    DOMAIN,
 )
 from .PublicTransportVictoria.public_transport_victoria import Connector
 
@@ -25,15 +32,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
-        data_schema = vol.Schema({
-            vol.Required(CONF_ID): str,
-            vol.Required(CONF_API_KEY): str,
-        })
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_ID): str,
+                vol.Required(CONF_API_KEY): str,
+            }
+        )
 
         errors = {}
         if user_input is not None:
             try:
-                self.connector = Connector(self.hass, user_input[CONF_ID], user_input[CONF_API_KEY])
+                self.connector = Connector(
+                    self.hass, user_input[CONF_ID], user_input[CONF_API_KEY]
+                )
                 self.route_types = await self.connector.async_route_types()
 
                 if not self.route_types:
@@ -56,9 +67,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_route_types(self, user_input=None):
         """Handle the route types step."""
-        data_schema = vol.Schema({
-            vol.Required(CONF_ROUTE_TYPE, default=0): vol.In(self.route_types),
-        })
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_ROUTE_TYPE, default=0): vol.In(self.route_types),
+            }
+        )
 
         errors = {}
         if user_input is not None:
@@ -68,7 +81,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
 
                 self.data[CONF_ROUTE_TYPE] = user_input[CONF_ROUTE_TYPE]
-                self.data[CONF_ROUTE_TYPE_NAME] = self.route_types[user_input[CONF_ROUTE_TYPE]]
+                self.data[CONF_ROUTE_TYPE_NAME] = self.route_types[
+                    user_input[CONF_ROUTE_TYPE]
+                ]
 
                 return await self.async_step_routes()
 
@@ -85,9 +100,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_routes(self, user_input=None):
         """Handle the route types step."""
-        data_schema = vol.Schema({
-            vol.Required(CONF_ROUTE, default=next(iter(self.routes))): vol.In(self.routes),
-        })
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_ROUTE, default=next(iter(self.routes))): vol.In(
+                    self.routes
+                ),
+            }
+        )
 
         errors = {}
         if user_input is not None:
@@ -114,19 +133,23 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_directions(self, user_input=None):
         """Handle the direction types step."""
-        data_schema = vol.Schema({
-            vol.Required(CONF_DIRECTION, default=next(iter(self.directions))): vol.In(self.directions),
-        })
+        data_schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_DIRECTION, default=next(iter(self.directions))
+                ): vol.In(self.directions),
+            }
+        )
 
         errors = {}
         if user_input is not None:
             try:
-                self.stops = await self.connector.async_stops(
-                    self.data[CONF_ROUTE]
-                )
+                self.stops = await self.connector.async_stops(self.data[CONF_ROUTE])
 
                 self.data[CONF_DIRECTION] = user_input[CONF_DIRECTION]
-                self.data[CONF_DIRECTION_NAME] = self.directions[user_input[CONF_DIRECTION]]
+                self.data[CONF_DIRECTION_NAME] = self.directions[
+                    user_input[CONF_DIRECTION]
+                ]
 
                 return await self.async_step_stops()
 
@@ -143,9 +166,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_stops(self, user_input=None):
         """Handle the stops types step."""
-        data_schema = vol.Schema({
-            vol.Required(CONF_STOP, default=next(iter(self.stops))): vol.In(self.stops),
-        })
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_STOP, default=next(iter(self.stops))): vol.In(
+                    self.stops
+                ),
+            }
+        )
 
         errors = {}
         if user_input is not None:
@@ -156,7 +183,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title = "{} line to {} from {}".format(
                     self.data[CONF_ROUTE_NAME],
                     self.data[CONF_DIRECTION_NAME],
-                    self.data[CONF_STOP_NAME]
+                    self.data[CONF_STOP_NAME],
                 )
 
                 return self.async_create_entry(title=title, data=self.data)
@@ -171,6 +198,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="stops", data_schema=data_schema, errors=errors
         )
+
 
 class CannotConnect(exceptions.HomeAssistantError):
     """Error to indicate we cannot connect."""

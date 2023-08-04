@@ -6,8 +6,15 @@ from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant.core import HomeAssistant
 
 from .const import (
-    CONF_DIRECTION, CONF_DIRECTION_NAME, CONF_ROUTE, CONF_ROUTE_NAME,
-    CONF_ROUTE_TYPE, CONF_ROUTE_TYPE_NAME, CONF_STOP, CONF_STOP_NAME, DOMAIN
+    CONF_DIRECTION,
+    CONF_DIRECTION_NAME,
+    CONF_ROUTE,
+    CONF_ROUTE_NAME,
+    CONF_ROUTE_TYPE,
+    CONF_ROUTE_TYPE_NAME,
+    CONF_STOP,
+    CONF_STOP_NAME,
+    DOMAIN,
 )
 from .PublicTransportVictoria.public_transport_victoria import Connector
 
@@ -23,17 +30,18 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Public Transport Victoria from a config entry."""
-    connector = Connector(hass,
-                          entry.data[CONF_ID],
-                          entry.data[CONF_API_KEY],
-                          entry.data[CONF_ROUTE_TYPE],
-                          entry.data[CONF_ROUTE],
-                          entry.data[CONF_DIRECTION],
-                          entry.data[CONF_STOP],
-                          entry.data[CONF_ROUTE_TYPE_NAME],
-                          entry.data[CONF_ROUTE_NAME],
-                          entry.data[CONF_DIRECTION_NAME],
-                          entry.data[CONF_STOP_NAME],
+    connector = Connector(
+        hass,
+        entry.data[CONF_ID],
+        entry.data[CONF_API_KEY],
+        entry.data[CONF_ROUTE_TYPE],
+        entry.data[CONF_ROUTE],
+        entry.data[CONF_DIRECTION],
+        entry.data[CONF_STOP],
+        entry.data[CONF_ROUTE_TYPE_NAME],
+        entry.data[CONF_ROUTE_NAME],
+        entry.data[CONF_DIRECTION_NAME],
+        entry.data[CONF_STOP_NAME],
     )
     await connector._init()
 

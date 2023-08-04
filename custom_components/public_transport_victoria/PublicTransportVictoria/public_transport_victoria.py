@@ -9,7 +9,9 @@ from hashlib import sha1
 from homeassistant.util import Throttle
 
 BASE_URL = "https://timetableapi.ptv.vic.gov.au"
-DEPARTURES_PATH = "/v3/departures/route_type/{}/stop/{}/route/{}?direction_id={}&max_results={}"
+DEPARTURES_PATH = (
+    "/v3/departures/route_type/{}/stop/{}/route/{}?direction_id={}&max_results={}"
+)
 DIRECTIONS_PATH = "/v3/directions/route/{}"
 MIN_TIME_BETWEEN_UPDATES = datetime.timedelta(minutes=2)
 MAX_RESULTS = 5
@@ -19,14 +21,26 @@ STOPS_PATH = "/v3/stops/route/{}/route_type/{}"
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class Connector:
     """Public Transport Victoria connector."""
 
     manufacturer = "Demonstration Corp"
 
-    def __init__(self, hass, id, api_key, route_type=None, route=None,
-                 direction=None, stop=None, route_type_name=None,
-                 route_name=None, direction_name=None, stop_name=None):
+    def __init__(
+        self,
+        hass,
+        id,
+        api_key,
+        route_type=None,
+        route=None,
+        direction=None,
+        stop=None,
+        route_type_name=None,
+        route_name=None,
+        direction_name=None,
+        stop_name=None,
+    ):
         """Init Public Transport Victoria connector."""
         self.hass = hass
         self.id = id
@@ -101,7 +115,9 @@ class Connector:
 
     async def async_stops(self, route):
         """Get stops from Public Transport Victoria API."""
-        url = build_URL(self.id, self.api_key, STOPS_PATH.format(route, self.route_type))
+        url = build_URL(
+            self.id, self.api_key, STOPS_PATH.format(route, self.route_type)
+        )
 
         async with aiohttp.ClientSession() as session:
             response = await session.get(url)
@@ -139,17 +155,19 @@ class Connector:
         for departure in self.departures:
             _LOGGER.debug(departure)
 
+
 def build_URL(id, api_key, request):
-    request = request + ('&' if ('?' in request) else '?')
-    raw = request + 'devid={}'.format(id)
-    hashed = hmac.new(api_key.encode('utf-8'), raw.encode('utf-8'), sha1)
+    request = request + ("&" if ("?" in request) else "?")
+    raw = request + "devid={}".format(id)
+    hashed = hmac.new(api_key.encode("utf-8"), raw.encode("utf-8"), sha1)
     signature = hashed.hexdigest()
-    url = BASE_URL + raw + '&signature={}'.format(signature)
+    url = BASE_URL + raw + "&signature={}".format(signature)
     _LOGGER.debug(url)
     return url
 
+
 def convert_utc_to_local(utc):
-    d = datetime.datetime.strptime(utc, '%Y-%m-%dT%H:%M:%SZ')
+    d = datetime.datetime.strptime(utc, "%Y-%m-%dT%H:%M:%SZ")
     d = d.replace(tzinfo=datetime.timezone.utc)
     d = d.astimezone()
-    return d.strftime('%I:%M %p')
+    return d.strftime("%I:%M %p")
